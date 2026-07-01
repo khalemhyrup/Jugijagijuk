@@ -1,13 +1,48 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informasi Keberangkatan Kereta - Jugijagijuk</title>
+    </head>
+<body>
+
+    <header>
+        <h1>Informasi Keberangkatan Kereta Api</h1>
+        <p>Sistem Pemesanan Tiket Jugijagijuk</p>
+    </header>
+
+    <div class="container">
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No. KA</th>
+                        <th>Nama Kereta</th>
+                        <th>Jenis KA</th>
+                        <th>Stasiun Asal</th>
+                        <th>Waktu Berangkat</th>
+                        <th>Stasiun Tujuan</th>
+                        <th>Waktu Tiba</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script>
-        // 1. Masukkan URL dan Anon Key Supabase milikmu di sini
-        const supabaseUrl = 'https://latangjpwljbyedpsidw.supabase.co/rest/v1/';
+        // PERBAIKAN: Hapus /rest/v1/ dari URL
+        const supabaseUrl = 'https://latangjpwljbyedpsidw.supabase.co';
         const supabaseKey = 'sb_publishable_KE2yCf39oIJMfjYUnYYVXA_0pZtMeJh';
+        
+        // Inisialisasi client
         const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
         async function ambilDataJadwal() {
-            // 2. Tarik data dari tabel jadwal dan relasi ke tabel kereta
             const { data, error } = await supabase
                 .from('jadwal')
                 .select(`
@@ -24,16 +59,19 @@
                 return;
             }
 
-            // 3. Render data ke dalam tabel HTML
             const tbody = document.querySelector('tbody');
-            tbody.innerHTML = ''; // Kosongkan data dummy
+            tbody.innerHTML = '';
             
             data.forEach(jadwal => {
                 const tr = document.createElement('tr');
+                // Pastikan data kereta ada agar tidak error jika relasi kosong
+                const namaKA = jadwal.kereta ? jadwal.kereta.NamaKA : '-';
+                const jenisKA = jadwal.kereta ? jadwal.kereta.JenisKA : '-';
+                
                 tr.innerHTML = `
                     <td><strong>${jadwal.no_ka}</strong></td>
-                    <td>${jadwal.kereta.NamaKA}</td>
-                    <td><span class="badge-tipe">${jadwal.kereta.JenisKA}</span></td>
+                    <td>${namaKA}</td>
+                    <td><span class="badge-tipe">${jenisKA}</span></td>
                     <td>${jadwal.stasiun_keberangkatan}</td>
                     <td>${jadwal.waktu_keberangkatan}</td>
                     <td>${jadwal.stasiun_tujuan}</td>
@@ -43,7 +81,7 @@
             });
         }
         
-        // Jalankan fungsi saat halaman dimuat
         ambilDataJadwal();
     </script>
 </body>
+</html>
