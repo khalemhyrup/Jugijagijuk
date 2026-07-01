@@ -1,155 +1,49 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Informasi Keberangkatan Kereta - Jugijagijuk</title>
-    <style>
-        :root {
-            --primary-color: #0056b3;
-            --secondary-color: #f4f4f9;
-            --text-color: #333;
-            --border-color: #ddd;
-        }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // 1. Masukkan URL dan Anon Key Supabase milikmu di sini
+        const supabaseUrl = 'https://latangjpwljbyedpsidw.supabase.co/rest/v1/';
+        const supabaseKey = 'sb_publishable_KE2yCf39oIJMfjYUnYYVXA_0pZtMeJh';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--secondary-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 1.5rem 1rem;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 1.8rem;
-        }
-
-        header p {
-            margin: 5px 0 0 0;
-            font-size: 1rem;
-            opacity: 0.8;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-
-        .table-wrapper {
-            background: white;
-            border-radius: 8px;
-            overflow-x: auto;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            white-space: nowrap;
-        }
-
-        thead {
-            background-color: #e9ecef;
-        }
-
-        th, td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        th {
-            font-weight: 600;
-            color: #495057;
-        }
-
-        tbody tr:hover {
-            background-color: #f1f3f5;
-        }
-
-        .badge-tipe {
-            background-color: #17a2b8;
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.85rem;
-        }
-
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.5rem;
+        async function ambilDataJadwal() {
+            // 2. Tarik data dari tabel jadwal dan relasi ke tabel kereta
+            const { data, error } = await supabase
+                .from('jadwal')
+                .select(`
+                    no_ka,
+                    stasiun_keberangkatan,
+                    waktu_keberangkatan,
+                    stasiun_tujuan,
+                    waktu_kedatangan,
+                    kereta ( NamaKA, JenisKA )
+                `);
+            
+            if (error) {
+                console.error('Gagal mengambil data:', error);
+                return;
             }
-            th, td {
-                padding: 0.75rem;
-            }
+
+            // 3. Render data ke dalam tabel HTML
+            const tbody = document.querySelector('tbody');
+            tbody.innerHTML = ''; // Kosongkan data dummy
+            
+            data.forEach(jadwal => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${jadwal.no_ka}</strong></td>
+                    <td>${jadwal.kereta.NamaKA}</td>
+                    <td><span class="badge-tipe">${jadwal.kereta.JenisKA}</span></td>
+                    <td>${jadwal.stasiun_keberangkatan}</td>
+                    <td>${jadwal.waktu_keberangkatan}</td>
+                    <td>${jadwal.stasiun_tujuan}</td>
+                    <td>${jadwal.waktu_kedatangan}</td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
-    </style>
-</head>
-<body>
-
-    <header>
-        <h1>Informasi Keberangkatan Kereta Api</h1>
-        <p>Sistem Pemesanan Tiket Jugijagijuk</p>
-    </header>
-
-    <div class="container">
-        <div class="table-wrapper">
-            <!-- Tabel ini dirancang berdasarkan relasi tabel jadwal dan kereta -->
-            <table>
-                <thead>
-                    <tr>
-                        <th>No. KA</th>
-                        <th>Nama Kereta</th>
-                        <th>Jenis KA</th>
-                        <th>Stasiun Asal</th>
-                        <th>Waktu Berangkat</th>
-                        <th>Stasiun Tujuan</th>
-                        <th>Waktu Tiba</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Contoh Data Dummy (Nanti diisi dinamis menggunakan PHP & database) -->
-                    <tr>
-                        <td><strong>KA001</strong></td>
-                        <td>Argo Bromo Anggrek</td>
-                        <td><span class="badge-tipe">Eksekutif</span></td>
-                        <td>GMR (Gambir)</td>
-                        <td>08:00:00</td>
-                        <td>SBI (Pasar Turi)</td>
-                        <td>16:30:00</td>
-                    </tr>
-                    <tr>
-                        <td><strong>KA042</strong></td>
-                        <td>Gajayana</td>
-                        <td><span class="badge-tipe">Eksekutif</span></td>
-                        <td>GMR (Gambir)</td>
-                        <td>18:40:00</td>
-                        <td>ML (Malang)</td>
-                        <td>07:06:00</td>
-                    </tr>
-                    <tr>
-                        <td><strong>KA123</strong></td>
-                        <td>Majapahit</td>
-                        <td><span class="badge-tipe">Ekonomi</span></td>
-                        <td>PSE (Pasar Senen)</td>
-                        <td>20:10:00</td>
-                        <td>ML (Malang)</td>
-                        <td>10:50:00</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
+        
+        // Jalankan fungsi saat halaman dimuat
+        ambilDataJadwal();
+    </script>
 </body>
-</html>
