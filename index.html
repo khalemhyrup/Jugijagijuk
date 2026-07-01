@@ -348,8 +348,8 @@
     }
 
     tbody.innerHTML = list.map(j => {
-      const namaKA = j.kereta?.NamaKA || '-';
-      const jenisKA = j.kereta?.JenisKA || '-';
+      const namaKA = j.kereta?.namaka || '-';
+      const jenisKA = j.kereta?.jeniska || '-';
       return `
         <tr>
           <td class="no-ka">${j.no_ka}</td>
@@ -380,7 +380,7 @@
         waktu_keberangkatan,
         stasiun_tujuan,
         waktu_kedatangan,
-        kereta ( NamaKA, JenisKA )
+        kereta ( namaka, jeniska )
       `)
       .order('waktu_keberangkatan', { ascending: true });
 
