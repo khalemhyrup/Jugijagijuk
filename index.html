@@ -2,45 +2,42 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Informasi Keberangkatan Kereta - Jugijagijuk</title>
-    </head>
+    <title>Informasi Jadwal Kereta</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
 <body>
+    <h1>Informasi Keberangkatan Kereta Api</h1>
+    <p>Sistem Pemesanan Tiket Jugijagijuk</p>
 
-    <header>
-        <h1>Informasi Keberangkatan Kereta Api</h1>
-        <p>Sistem Pemesanan Tiket Jugijagijuk</p>
-    </header>
-
-    <div class="container">
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>No. KA</th>
-                        <th>Nama Kereta</th>
-                        <th>Jenis KA</th>
-                        <th>Stasiun Asal</th>
-                        <th>Waktu Berangkat</th>
-                        <th>Stasiun Tujuan</th>
-                        <th>Waktu Tiba</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    </tbody>
-            </table>
-        </div>
-    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>No. KA</th>
+                <th>Nama Kereta</th>
+                <th>Jenis KA</th>
+                <th>Stasiun Asal</th>
+                <th>Waktu Berangkat</th>
+                <th>Stasiun Tujuan</th>
+                <th>Waktu Tiba</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="7">Sedang memuat data...</td>
+            </tr>
+        </tbody>
+    </table>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <script>
-        // PERBAIKAN: Hapus /rest/v1/ dari URL
-        const supabaseUrl = 'https://latangjpwljbyedpsidw.supabase.co';
-        const supabaseKey = 'sb_publishable_KE2yCf39oIJMfjYUnYYVXA_0pZtMeJh';
-        
-        // Inisialisasi client
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        const supabase = supabase.createClient(
+            'https://latangjpwljbyedpsidw.supabase.co', 
+            'sb_publishable_KE2yCf39oIJMfjYUnYYVXA_0pZtMeJh'
+        );
 
         async function ambilDataJadwal() {
             const { data, error } = await supabase
@@ -55,7 +52,8 @@
                 `);
             
             if (error) {
-                console.error('Gagal mengambil data:', error);
+                console.error('Error:', error);
+                document.querySelector('tbody').innerHTML = '<tr><td colspan="7">Gagal memuat data.</td></tr>';
                 return;
             }
 
@@ -64,14 +62,10 @@
             
             data.forEach(jadwal => {
                 const tr = document.createElement('tr');
-                // Pastikan data kereta ada agar tidak error jika relasi kosong
-                const namaKA = jadwal.kereta ? jadwal.kereta.NamaKA : '-';
-                const jenisKA = jadwal.kereta ? jadwal.kereta.JenisKA : '-';
-                
                 tr.innerHTML = `
-                    <td><strong>${jadwal.no_ka}</strong></td>
-                    <td>${namaKA}</td>
-                    <td><span class="badge-tipe">${jenisKA}</span></td>
+                    <td>${jadwal.no_ka}</td>
+                    <td>${jadwal.kereta?.NamaKA || '-'}</td>
+                    <td>${jadwal.kereta?.JenisKA || '-'}</td>
                     <td>${jadwal.stasiun_keberangkatan}</td>
                     <td>${jadwal.waktu_keberangkatan}</td>
                     <td>${jadwal.stasiun_tujuan}</td>
