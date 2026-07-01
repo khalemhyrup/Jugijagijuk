@@ -1,81 +1,421 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Informasi Jadwal Kereta</title>
-    <style>
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jugijagijuk — Papan Keberangkatan Kereta Api</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0b0f14;
+    --bg-panel:#121820;
+    --bg-row:#0f151c;
+    --bg-row-alt:#141b23;
+    --amber:#ffb300;
+    --amber-dim:#8a5c00;
+    --maroon:#a3232c;
+    --green:#3ecf8e;
+    --red:#ff5a5f;
+    --steel:#5c6b7a;
+    --text-soft:#c7d0d9;
+    --border:#232d38;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 15% 0%, rgba(163,35,44,0.15), transparent 45%),
+      radial-gradient(circle at 85% 100%, rgba(255,179,0,0.06), transparent 40%),
+      var(--bg-deep);
+    color:var(--text-soft);
+    font-family:'Rajdhani',sans-serif;
+    min-height:100vh;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:22px 32px;
+    border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg, rgba(163,35,44,0.12), transparent);
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .brand-mark{
+    width:44px;height:44px;
+    border-radius:8px;
+    background:linear-gradient(135deg,var(--maroon),#6e161c);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Space Mono',monospace;
+    font-weight:700;color:var(--amber);
+    font-size:18px;
+    box-shadow:0 0 0 1px rgba(255,179,0,0.25) inset;
+  }
+  .brand h1{
+    margin:0;
+    font-size:22px;
+    font-weight:700;
+    letter-spacing:0.5px;
+    color:#fff;
+    text-transform:uppercase;
+  }
+  .brand p{
+    margin:2px 0 0;
+    font-size:13px;
+    color:var(--steel);
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    font-family:'Space Mono',monospace;
+  }
+  #jam{
+    font-family:'Space Mono',monospace;
+    font-size:26px;
+    color:var(--amber);
+    letter-spacing:2px;
+    text-shadow:0 0 12px rgba(255,179,0,0.35);
+    font-weight:700;
+  }
+  #tanggal{
+    font-size:12px;
+    color:var(--steel);
+    text-align:right;
+    font-family:'Space Mono',monospace;
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+
+  /* ---------- Controls ---------- */
+  .controls{
+    max-width:1200px;
+    margin:28px auto 0;
+    padding:0 24px;
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .controls input{
+    flex:1;
+    min-width:220px;
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    color:#fff;
+    padding:12px 16px;
+    border-radius:6px;
+    font-family:'Rajdhani',sans-serif;
+    font-size:15px;
+    outline:none;
+    transition:border-color .15s;
+  }
+  .controls input::placeholder{color:var(--steel);}
+  .controls input:focus{border-color:var(--amber-dim);}
+  .status-pill{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:0 16px;
+    font-family:'Space Mono',monospace;
+    font-size:12px;
+    color:var(--steel);
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+  .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 8px var(--green);
+    animation:pulse 2s infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1;}
+    50%{opacity:.35;}
+  }
+
+  /* ---------- Board ---------- */
+  .board-wrap{
+    max-width:1200px;
+    margin:18px auto 60px;
+    padding:0 24px;
+  }
+  .board{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 20px 60px rgba(0,0,0,0.4);
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+  }
+  thead th{
+    background:#171f28;
+    color:var(--steel);
+    font-family:'Space Mono',monospace;
+    font-size:11px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    text-align:left;
+    padding:14px 16px;
+    border-bottom:2px solid var(--border);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:16px;
+    border-bottom:1px solid var(--border);
+    font-size:15px;
+    vertical-align:middle;
+  }
+  tbody tr:nth-child(odd){background:var(--bg-row);}
+  tbody tr:nth-child(even){background:var(--bg-row-alt);}
+  tbody tr:hover{background:#1a232e;}
+
+  .no-ka{
+    font-family:'Space Mono',monospace;
+    color:var(--amber);
+    font-weight:700;
+    letter-spacing:1px;
+  }
+  .nama-ka{
+    color:#fff;
+    font-weight:600;
+    font-size:16px;
+  }
+  .jenis-badge{
+    display:inline-block;
+    padding:3px 10px;
+    border-radius:20px;
+    font-family:'Space Mono',monospace;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    font-weight:700;
+  }
+  .jenis-eksekutif{background:rgba(255,179,0,0.15); color:var(--amber); border:1px solid var(--amber-dim);}
+  .jenis-bisnis{background:rgba(62,207,142,0.12); color:var(--green); border:1px solid rgba(62,207,142,0.3);}
+  .jenis-ekonomi{background:rgba(92,107,122,0.2); color:var(--text-soft); border:1px solid var(--border);}
+
+  .waktu{
+    font-family:'Space Mono',monospace;
+    font-size:22px;
+    color:var(--amber);
+    font-weight:700;
+    letter-spacing:1px;
+  }
+  .stasiun{
+    font-size:14.5px;
+    color:var(--text-soft);
+  }
+  .stasiun small{
+    display:block;
+    color:var(--steel);
+    font-size:10.5px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    font-family:'Space Mono',monospace;
+    margin-top:2px;
+  }
+  .arrow{
+    color:var(--maroon);
+    font-weight:700;
+  }
+
+  .empty-state, .loading-state{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--steel);
+    font-family:'Space Mono',monospace;
+    font-size:13px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+  .loading-state .flicker{
+    animation:flicker 1.1s infinite;
+  }
+  @keyframes flicker{
+    0%,100%{opacity:1;}
+    45%{opacity:0.3;}
+    50%{opacity:1;}
+  }
+  .error-state{
+    text-align:center;
+    padding:50px 20px;
+    color:var(--red);
+    font-family:'Space Mono',monospace;
+    font-size:13px;
+  }
+
+  @media (max-width:720px){
+    header{flex-direction:column;align-items:flex-start;gap:12px;padding:18px;}
+    #jam{font-size:20px;}
+    thead th:nth-child(3), tbody td:nth-child(3){display:none;}
+    table, tbody, tr, td{display:block;width:100%;}
+    thead{display:none;}
+    tbody tr{
+      padding:14px;
+      border-bottom:6px solid var(--bg-deep);
+    }
+    tbody td{border:none;padding:4px 0;}
+    .waktu{font-size:20px;}
+  }
+</style>
 </head>
 <body>
-    <h1>Informasi Keberangkatan Kereta Api</h1>
-    <p>Sistem Pemesanan Tiket Jugijagijuk</p>
 
+<header>
+  <div class="brand">
+    <div class="brand-mark">KA</div>
+    <div>
+      <h1>Jugijagijuk</h1>
+      <p>Sistem Informasi Keberangkatan Kereta Api</p>
+    </div>
+  </div>
+  <div style="text-align:right;">
+    <div id="jam">--:--:--</div>
+    <div id="tanggal">-</div>
+  </div>
+</header>
+
+<div class="controls">
+  <input type="text" id="cari" placeholder="Cari nomor KA, nama kereta, atau stasiun...">
+  <div class="status-pill"><span class="dot" id="statusDot"></span><span id="statusText">Menghubungkan...</span></div>
+</div>
+
+<div class="board-wrap">
+  <div class="board">
     <table>
-        <thead>
-            <tr>
-                <th>No. KA</th>
-                <th>Nama Kereta</th>
-                <th>Jenis KA</th>
-                <th>Stasiun Asal</th>
-                <th>Waktu Berangkat</th>
-                <th>Stasiun Tujuan</th>
-                <th>Waktu Tiba</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td colspan="7">Sedang memuat data...</td>
-            </tr>
-        </tbody>
+      <thead>
+        <tr>
+          <th>No. KA</th>
+          <th>Nama Kereta</th>
+          <th>Jenis</th>
+          <th>Asal</th>
+          <th>Berangkat</th>
+          <th>Tujuan</th>
+          <th>Tiba</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr><td colspan="7" class="loading-state"><span class="flicker">MEMUAT JADWAL...</span></td></tr>
+      </tbody>
     </table>
+  </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        const supabase = supabase.createClient(
-            'https://latangjpwljbyedpsidw.supabase.co', 
-            'sb_publishable_KE2yCf39oIJMfjYUnYYVXA_0pZtMeJh'
-        );
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ---------- Jam realtime ----------
+  function updateJam(){
+    const now = new Date();
+    document.getElementById('jam').textContent = now.toLocaleTimeString('id-ID', { hour12:false });
+    document.getElementById('tanggal').textContent = now.toLocaleDateString('id-ID', {
+      weekday:'long', day:'2-digit', month:'long', year:'numeric'
+    });
+  }
+  updateJam();
+  setInterval(updateJam, 1000);
 
-        async function ambilDataJadwal() {
-            const { data, error } = await supabase
-                .from('jadwal')
-                .select(`
-                    no_ka,
-                    stasiun_keberangkatan,
-                    waktu_keberangkatan,
-                    stasiun_tujuan,
-                    waktu_kedatangan,
-                    kereta ( NamaKA, JenisKA )
-                `);
-            
-            if (error) {
-                console.error('Error:', error);
-                document.querySelector('tbody').innerHTML = '<tr><td colspan="7">Gagal memuat data.</td></tr>';
-                return;
-            }
+  // ---------- Supabase ----------
+  // PENTING: nama variabel client TIDAK BOLEH "supabase" karena akan
+  // menimpa (shadow) object global "supabase" dari CDN sebelum selesai
+  // di-assign, sehingga menyebabkan ReferenceError dan seluruh script berhenti.
+  const supabaseClient = supabase.createClient(
+    'https://latangjpwljbyedpsidw.supabase.co',
+    'sb_publishable_KE2yCf39oIJMfjYUnYYVXA_0pZtMeJh'
+  );
 
-            const tbody = document.querySelector('tbody');
-            tbody.innerHTML = '';
-            
-            data.forEach(jadwal => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${jadwal.no_ka}</td>
-                    <td>${jadwal.kereta?.NamaKA || '-'}</td>
-                    <td>${jadwal.kereta?.JenisKA || '-'}</td>
-                    <td>${jadwal.stasiun_keberangkatan}</td>
-                    <td>${jadwal.waktu_keberangkatan}</td>
-                    <td>${jadwal.stasiun_tujuan}</td>
-                    <td>${jadwal.waktu_kedatangan}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-        
-        ambilDataJadwal();
-    </script>
+  let semuaJadwal = [];
+
+  function jenisClass(jenis){
+    if(!jenis) return 'jenis-ekonomi';
+    const j = jenis.toLowerCase();
+    if(j.includes('eksekutif')) return 'jenis-eksekutif';
+    if(j.includes('bisnis')) return 'jenis-bisnis';
+    return 'jenis-ekonomi';
+  }
+
+  function renderJadwal(list){
+    const tbody = document.getElementById('tbody');
+
+    if(list.length === 0){
+      tbody.innerHTML = `<tr><td colspan="7" class="empty-state">TIDAK ADA JADWAL DITEMUKAN</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = list.map(j => {
+      const namaKA = j.kereta?.NamaKA || '-';
+      const jenisKA = j.kereta?.JenisKA || '-';
+      return `
+        <tr>
+          <td class="no-ka">${j.no_ka}</td>
+          <td class="nama-ka">${namaKA}</td>
+          <td><span class="jenis-badge ${jenisClass(jenisKA)}">${jenisKA}</span></td>
+          <td class="stasiun">${j.stasiun_keberangkatan}<small>Asal</small></td>
+          <td class="waktu">${j.waktu_keberangkatan}</td>
+          <td class="stasiun">${j.stasiun_tujuan}<small>Tujuan</small></td>
+          <td class="waktu">${j.waktu_kedatangan}</td>
+        </tr>`;
+    }).join('');
+  }
+
+  function setStatus(state, text){
+    const dot = document.getElementById('statusDot');
+    const label = document.getElementById('statusText');
+    label.textContent = text;
+    if(state === 'ok'){ dot.style.background = 'var(--green)'; dot.style.boxShadow='0 0 8px var(--green)'; }
+    if(state === 'error'){ dot.style.background = 'var(--red)'; dot.style.boxShadow='0 0 8px var(--red)'; dot.style.animation='none'; }
+  }
+
+  async function ambilDataJadwal(){
+    const { data, error } = await supabaseClient
+      .from('jadwal')
+      .select(`
+        no_ka,
+        stasiun_keberangkatan,
+        waktu_keberangkatan,
+        stasiun_tujuan,
+        waktu_kedatangan,
+        kereta ( NamaKA, JenisKA )
+      `)
+      .order('waktu_keberangkatan', { ascending: true });
+
+    if(error){
+      console.error('Supabase error:', error);
+      document.getElementById('tbody').innerHTML =
+        `<tr><td colspan="7" class="error-state">GAGAL MEMUAT DATA — ${error.message}</td></tr>`;
+      setStatus('error', 'Gagal terhubung');
+      return;
+    }
+
+    semuaJadwal = data || [];
+    renderJadwal(semuaJadwal);
+    setStatus('ok', `Live · ${semuaJadwal.length} jadwal`);
+  }
+
+  document.getElementById('cari').addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    if(!q){ renderJadwal(semuaJadwal); return; }
+    const hasil = semuaJadwal.filter(j => {
+      const namaKA = (j.kereta?.NamaKA || '').toLowerCase();
+      return (
+        String(j.no_ka).toLowerCase().includes(q) ||
+        namaKA.includes(q) ||
+        j.stasiun_keberangkatan.toLowerCase().includes(q) ||
+        j.stasiun_tujuan.toLowerCase().includes(q)
+      );
+    });
+    renderJadwal(hasil);
+  });
+
+  ambilDataJadwal();
+  // refresh otomatis tiap 60 detik
+  setInterval(ambilDataJadwal, 60000);
+</script>
+
 </body>
 </html>
