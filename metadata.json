@@ -1,0 +1,6 @@
+{
+  "name": "Jugijagijuk",
+  "description": "Sistem Informasi Keberangkatan dan Pemesanan Tiket Kereta Api Modern dengan sistem pengelolaan jadwal admin dan pemilihan kursi real-time.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
